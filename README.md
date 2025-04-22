@@ -1,3 +1,3 @@
 # ClosedFriend
 
-Mingalarparbyr
+Mingalarpar
