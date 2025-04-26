@@ -1,18 +1,21 @@
-// main.js
-import { UserManager } from "oidc-client-ts";
-import { ENV } from "./env.js";
+import { UserManager } from "https://cdn.skypack.dev/oidc-client-ts";
+import { signOutRedirect, config } from "./config.js";
 
-const cognitoAuthConfig = {
-    authority: ENV.AUTHORITY,
-    client_id: ENV.CLIENT_ID,
-    redirect_uri: ENV.REDIRECT_URI,
-    response_type: "code",
-    scope: "phone openid email"
-};
+export const userManager = new UserManager({
+  ...config,
+});
 
-export const userManager = new UserManager({ ...cognitoAuthConfig });
+document.getElementById("signIn").addEventListener("click", async () => {
+  await userManager.signinRedirect();
+});
 
-export async function signOutRedirect () {
-    window.location.href =
-        `${ENV.COGNITO_DOMAIN}/logout?client_id=${ENV.CLIENT_ID}&logout_uri=${encodeURIComponent(ENV.LOGOUT_URI)}`;
-}
+document.getElementById("signOut").addEventListener("click", async () => {
+  await signOutRedirect();
+});
+
+userManager.signinCallback().then(function (user) {
+  document.getElementById("email").textContent = user.profile?.email;
+  document.getElementById("access-token").textContent = user.access_token;
+  document.getElementById("id-token").textContent = user.id_token;
+  document.getElementById("refresh-token").textContent = user.refresh_token;
+});
